@@ -25,38 +25,48 @@ int sensorValue = 0;
 
 float temp(){
       float sensorValue = analogRead(36);
-      float v=sensorValue*3.3/4096+0.2;
+      float v=sensorValue*3.3/4096;
 //      float vout = (v * R) / (R + 1 / (2 * 3.141592 * C));
-      float voltage=v*(14.82+67.50)/67.50;
-      float V1=4.94*4.40/(8.51+4.40);
-      float R=((350.00/146.00)*(1.00+146.00/322.00)*(322.00/(322.00+146.00))*1450.00*4.94)/(voltage+V1*350.00/146.00)-1450.00;
+      float voltage=v*(15.00+68.00)/68.00;
+      float V1=5.00*4.70/(8.20+4.70);
+      float R=((330.00/150.00)*(1.00+150.00/330.00)*(330.00/(330.00+150.00))*1500.00*5.00)/(voltage+V1*330.00/150.00)-1500.00;
       float temperature=(R-1035.2000)/3.8758;
       return temperature;
 }
 
  
-float avg(){ 
+//float avg(){ 
+//  float sum = 0.00;
+//  float l_sum = 0.00;
+//  float l_avg = 0.00;
+//  float avg = 0.00;
+//  float t_avg = 0.00;
+//  float p_avg = 0.00;
+//  for (int i = 0; i < 100; i++) {
+//    sum += temp();
+//    delay(10);
+//  }
+//  l_avg = sum/100;
+//  for(int k=0; k<10; k++){
+//  if(temp()<(t_avg+1.00) && temp()>(t_avg-1.00)){
+//     l_sum += temp();
+//     delay(10);
+//  } else{
+//    l_sum += l_avg;
+//    delay(10);
+//  }
+//  }
+//  return round(l_sum)/10;
+// }
+
+ float avg(){ 
   float sum = 0.00;
-  float l_sum = 0.00;
-  float l_avg = 0.00;
   float avg = 0.00;
-  float t_avg = 0.00;
-  float p_avg = 0.00;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 1000; i++) {
     sum += temp();
-    delay(10);
+    delay(5);
   }
-  l_avg = sum/100;
-  for(int k=0; k<10; k++){
-  if(temp()<(t_avg+3.00) && temp()>(t_avg-3.00)){
-     l_sum += temp();
-     delay(10);
-  } else{
-    l_sum += l_avg;
-    delay(10);
-  }
-  }
-  return round(l_sum)/10;
+  return round(sum/100)/10;
  }
 
 
@@ -93,11 +103,18 @@ void loop(){
   if(Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 5000 || sendDataPrevMillis == 0)){
     sendDataPrevMillis = millis();
     if(Firebase.RTDB.setFloat(&fbdo,"Sensor/temperature",avg())){
-      Serial.println(); Serial.print(avg());
+      Serial.println(); Serial.println(avg());
       Serial.print(" - successfully saved to: " + fbdo.dataPath());
       Serial.println(" (" + fbdo.dataType()+ ")");
     }else{
       Serial.println("FAILED: " + fbdo.errorReason());
     }
+//    if(Firebase.RTDB.setFloat(&fbdo,"Sensor/temperaturetest",avgtest())){
+//      Serial.println(); Serial.print(avgtest());
+//      Serial.print(" - successfully saved to: " + fbdo.dataPath());
+//      Serial.println(" (" + fbdo.dataType()+ ")");
+//    }else{
+//      Serial.println("FAILED: " + fbdo.errorReason());
+//    }
   }
 }
